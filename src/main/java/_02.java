@@ -59,29 +59,32 @@ boolean isSafe(List<Integer> report) {
 }
 
 boolean isSafe2(List<Integer> report) {
-    SequenceType type = SequenceType.UNKNOWN;
-    int failCount = 0;
-    for (int i = 0; i < report.size() - 1; i++) {
-        SequenceType diffType = getDiffType(report.get(i), report.get(i + 1));
-        if (diffType == null) {
-            if (failCount == 0) {
-                // second chance
-                failCount++;
-                continue;
+    // is it a valid increasing or decreasing report
+    return isValidReport(report, -1) || isValidReport(report, 1);
+}
+
+boolean isValidReport(List<Integer> report, int sign) {
+    // longest increasing/decreasing sequence
+    int[] l = new int[report.size()];
+
+    for (int i = 0; i < report.size(); i++) {
+        l[i] = 1;
+        for (int j = 0; j < i; j++) {
+            int diff = report.get(j) - report.get(i);
+
+            if (isValidDiff(diff, sign)) {
+                l[i] = Math.max(l[i], l[j] + 1);
             }
-            return false; // Failed: Any two adjacent levels differ by at least one and at most three.
-        } else if (type == SequenceType.UNKNOWN) {
-            type = diffType;
-        } else if (type != diffType) {
-            if (failCount == 0) {
-                // second chance
-                failCount++;
-                continue;
-            }
-            return false; // Failed: The levels are either all increasing or all decreasing.
         }
     }
-    return true;
+
+    // one error allowed
+    return Arrays.stream(l).max().getAsInt() >= report.size() - 1;
+}
+
+boolean isValidDiff(int diff, int sign) {
+    assert sign == 1 || sign == -1;
+    return 1 <= diff * sign && diff * sign <= 3;
 }
 
 List<Integer> parseNumbersFromLine(String line) {
