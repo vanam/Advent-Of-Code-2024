@@ -58,7 +58,10 @@ boolean hasSolution(long testValue, List<Long> numbers, Operator[] ops) {
         List<Long> newSubResults = new ArrayList<>();
         for (long a : subResults) {
             for (Operator op : ops) {
-                newSubResults.add(op.call(a, b));
+                long c = op.call(a, b);
+                if (c <= testValue) { // keep only possible solutions
+                    newSubResults.add(op.call(a, b));
+                }
             }
         }
         subResults = newSubResults;
