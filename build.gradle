@@ -32,3 +32,14 @@ tasks.withType(JavaExec).configureEach {
     jvmArgs += '--enable-preview'
     jvmArgs += '-ea'
 }
+
+tasks.withType(JavaExec).configureEach { javaExecTask ->
+    javaExecTask.doFirst {
+        javaExecTask.extensions.extraProperties["startTime"] = System.nanoTime()
+    }
+    javaExecTask.doLast {
+        def startTime = javaExecTask.extensions.extraProperties["startTime"]
+        def durationMillis = (System.nanoTime() - startTime) / 1_000_000
+        println "Task ${javaExecTask.path} took ${durationMillis} ms"
+    }
+}
